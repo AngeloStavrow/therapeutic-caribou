@@ -1,0 +1,72 @@
+/* styles */
+/* called by your view template */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+    background-color: #aaa;
+  font-family: "Benton Sans", "Helvetica Neue", helvetica, arial, sans-serif;
+  margin: 2em auto;
+  width: 800px;
+}
+
+header, main {
+  background-color: #f8f8f8;
+  padding: 2em;
+}
+
+header {
+  border-radius: 0.5em 0.5em 0 0;
+}
+
+main {
+  border-radius: 0 0 0.5em 0.5em;
+}
+
+h1 {
+  font-style: italic;
+  color: #3f3f3f;
+}
+
+p.speaker {
+  background-color: #009;
+  border-radius: 1em 1em 1em 0;
+  color: cyan;
+  padding: 0.5em 1em;
+}
+
+p.caribou {
+  background-color: #900;
+  border-radius: 1em 1em 0 1em;
+  color: yellow;
+  padding: 0.5em 1em;
+}
+
+button {
+  font-size: 16px;
+  border-radius: 3px;
+  background-color: lightgrey;
+  border: 1px solid grey;
+  box-shadow: 2px 2px teal;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: yellow;
+}
+
+button:active {
+  box-shadow: none;
+}
+
+li {
+  margin-bottom: 5px;
+}
+
+footer {
+  margin-top: 50px;
+  padding-top: 25px;
+  border-top: 1px solid lightgrey;
+}

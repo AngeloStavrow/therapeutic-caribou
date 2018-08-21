@@ -1,0 +1,121 @@
+<!-- This is a static file -->
+<!-- served from your routes in server.js -->
+
+<!-- You might want to try something fancier: -->
+<!-- html/nunjucks docs: https://mozilla.github.io/nunjucks/ -->
+<!-- pug: https://pugjs.org/ -->
+<!-- haml: http://haml.info/ -->
+<!-- hbs(handlebars): http://handlebarsjs.com/ -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>The Therapeutic Caribou</title>
+    <meta name="description" content="Therapeutic Caribou: A cool thing made with Glitch">
+    <link id="favicon" rel="icon" href="https://glitch.com/edit/favicon-app.ico" type="image/x-icon">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- import the webpage's stylesheet -->
+    <link rel="stylesheet" href="/style.css">
+  </head>
+  <body>
+    <header>
+      <h1>
+        <img src="https://cdn.glitch.com/6ce031ca-ccf9-43d8-9ff4-ad88d983dc46%2Flarge-47512_640.png?1534804509471" alt="Caribou illustration" width="100%" />
+        Hi there! I'm the therapeutic caribou.
+      </h1>
+    </header>
+
+    <main>
+      <p>(Note: you'll need to grant access to your microphone.)</p>
+      <p class="caribou">How are you feeling today?</p>
+      <div class="conversation" contenteditable>
+        <!-- This is where your conversation with the caribou goes. -->
+      </div>
+    </main>
+
+    <footer>
+      Made with <a href="https://glitch.com">Glitch</a>! Caribou illustration from <a href="https://pixabay.com/en/large-walking-animal-antlers-47512/">Pixabay</a>.
+    </footer>
+    
+    <script>
+      window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
+      recognition.interimResults = true;
+      
+      let p = document.createElement('p');
+      const conversation = document.querySelector('.conversation');
+      conversation.appendChild(p)
+      
+      recognition.addEventListener('result', event => {
+        const transcript = Array.from(event.results)
+        .map(result => result[0])
+        .map(result => result.transcript)
+        .join('');
+        
+        p.classList.add('speaker');
+        p.textContent = transcript;
+        
+        if (event.results[0].isFinal) {
+          p = document.createElement('p');
+          p.classList.remove('speaker');
+          conversation.appendChild(p);
+        }
+      });
+      
+      function postReply(text) {
+        p.classList.add('caribou');
+        p.textContent = text;
+        p = document.createElement('p');
+        p.classList.remove('caribou');
+        conversation.appendChild(p);
+      }
+      
+      function fetchReply() {
+        // If the last message in the conversation is from the caribou,
+        // let's not repeat ourselves.
+        const lastMessage = conversation.lastChild.previousSibling;
+        if(lastMessage.classList.contains('caribou')) { return; }
+        
+        // Get the last sentence we understood. Note that we append an
+        // empty 'p' tag in preparation for the next spoken sentence,
+        // so we want to be sure that we walk back to the lastChild's
+        // previous sibling to get the text.
+        const spokenWords = conversation.lastChild.previousSibling.innerText;
+        
+        // If we didn't catch that last sentence, let the user know.
+        if (spokenWords == null || spokenWords.length === 0) {
+          postReply("I didn't quite catch that, would you mind repeating?");
+        }
+        // Otherwise, send it for sentiment analysis.
+        else {
+          const data = { text: spokenWords }
+          fetch('/analyze', {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers:{
+              'Content-Type': 'application/json'
+            }
+          })
+          .then(res => res.json())
+          .then(response => postReply(response.data))
+          .catch(error => console.error('Error: ', error))
+        }
+        
+        recognition.start();
+      }
+      
+      recognition.addEventListener('end', fetchReply);
+      
+      recognition.start();
+    </script>
+
+    <!-- include the Glitch button to show what the webpage is about and
+          to make it easier for folks to view source and remix -->
+    <div class="glitchButton" style="position:fixed;top:20px;right:20px;"></div>
+    <script src="https://button.glitch.me/button.js"></script>
+
+  </body>
+</html>
