@@ -74,9 +74,11 @@
       }
       
       function fetchReply() {
+        const lastMessage = conversation.lastChild.previousSibling;
+        if (typeof lastMessage === 'undefined') { return; }
+        
         // If the last message in the conversation is from the caribou,
         // let's not repeat ourselves.
-        const lastMessage = conversation.lastChild.previousSibling;
         if(lastMessage.classList.contains('caribou')) { return; }
         
         // Get the last sentence we understood. Note that we append an
